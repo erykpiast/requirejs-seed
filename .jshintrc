@@ -7,14 +7,9 @@
         "expect": true,
         "beforeEach": true,
         "afterEach": true,
-        /* ngMock >> */
-            "module": true,
-            "inject": true,
-            "$controller": true,
-            "$compile": true,
-        /* << ngMock */
     /* << Jasmine */
-        "angular": true
+        "define": true,
+        "require": true
     },
     "regexdash": true,
     "browser": true,
