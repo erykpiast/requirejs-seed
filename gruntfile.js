@@ -30,7 +30,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerMultiTask('build', simpleMultiTaskRunner);
-    grunt.registerMultiTask('css', simpleMultiTaskRunner);
+    grunt.registerMultiTask('styles', simpleMultiTaskRunner);
 
 
     grunt.initConfig({
@@ -71,23 +71,25 @@ module.exports = function (grunt) {
                 'bower-install-simple:dev',
                 'copy:all',
                 'concat:requirejs-config',
-                'css:dev'
+                'styles:dev'
             ],
             dist: [
                 'bower-install-simple:dist',
                 'requirejs:all',
                 'uglify:dist',
-                'css:dist'
+                'styles:dist'
             ]
         },
-        css: {
+        styles: {
             dev: [
                 'autoprefixer:dev',
-                'concat:css'
+                'concat:styles',
+                'clean:styles'
             ],
             dist: [
                 'autoprefixer:dist',
-                'cssmin:dist'
+                'cssmin:dist',
+                'clean:styles'
             ]
         },
         concat: {
@@ -100,7 +102,7 @@ module.exports = function (grunt) {
                     dest: '<%= config.dist %>/<%= pkg.name %>.js'
                 }]
             },
-            css: {
+            styles: {
                 options: {
                      process: function(src, filepath) {
                         var filename = /\/([^\/]+$)/.exec(filepath)[1];
