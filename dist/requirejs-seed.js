@@ -1,0 +1,1 @@
+define("mods/example",[""],function(){return{name:"Example"}}),require(["mods/example"],function(a){var b="Hello ";console.log(b+a.name+"!")}),define("main",function(){});

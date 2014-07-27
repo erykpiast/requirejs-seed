@@ -1,0 +1,28 @@
+{
+  "name": "requirejs-seed",
+  "version": "0.0.1",
+  "homepage": "https://github.com/erykpiast/requirejs-seed",
+  "authors": [
+    "Eryk Napierała <eryk.piast@gmail.com>"
+  ],
+  "description": "One more seed for web applications based on RequireJS module loader. Simple structure and Grunt file included.",
+  "main": "gruntfile.js",
+  "keywords": [
+    "requirejs",
+    "require",
+    "seed",
+    "boilerplate"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.14",
+    "requirejs-text": "~2.0.12"
+  }
+}
