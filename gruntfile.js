@@ -1,11 +1,37 @@
 module.exports = function (grunt) {
 
     grunt.registerTask('default', [ 'dev' ]);
-    grunt.registerTask('dev', [ 'jshint', 'build:dev', 'http-server:dev', 'watch:demo' ]);
-    grunt.registerTask('dist', [ 'jshint', 'build:dist' ]);
+
+    grunt.registerTask('dev', [
+        'jshint',
+        'clean:dist',
+        'clean:bower',
+        'build:dev',
+        'http-server:dev',
+        'watch:demo'
+    ]);
+
+    grunt.registerTask('dist', [
+        'jshint',
+        'clean:dist',
+        'clean:bower',
+        'build:dist'
+    ]);
+
+    grunt.registerTask('demo', [
+        'dist',
+        'http-server:demo'
+    ]);
+
+    grunt.registerTask('test', [
+        'dist',
+        'karma:unit',
+        'watch:test'
+    ]);
+
     grunt.registerMultiTask('build', simpleMultiTaskRunner);
-    grunt.registerTask('demo', [ 'build:dist', 'http-server:demo' ]);
-    grunt.registerTask('test', [ 'build:dist', 'karma:unit', 'watch:test' ]);
+    grunt.registerMultiTask('css', simpleMultiTaskRunner);
+
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -26,27 +52,43 @@ module.exports = function (grunt) {
             spec: {
                 main: 'test/main.js',
                 files: 'src/scripts/**/*.spec.js'
+            },
+            styles: {
+                dir: 'src/styles',
+                files: 'src/styles/**/*.css'
             }
         },
         clean: {
-            dist: [ '<%= config.dist %>/*' ]
-        },
-        karma: {
-            unit: {
-                options: {
-                    configFile: 'test/karma.conf.js',
-                    files: [
-                        '<%= config.dist %>/<%= pkg.name %>.js',
-                        { pattern: 'bower_components/**/*', included: false },
-                        { pattern: 'src/scripts/**/*.spec.js', included: false },
-                        'test/main.js'
-                    ]
-                }
-            }
+            dist: [ '<%= config.dist %>/*' ],
+            bower: 'bower_components',
+            styles: [
+                '<%= config.dist %>/**/*.css',
+                '!<%= config.dist %>/<%= pkg.name %>.css'
+            ]
         },
         build: {
-            dev: [ 'clean:dist', 'copy:all', 'concat:requirejs-config' ],
-            dist: [ 'clean:dist', 'requirejs:all', 'uglify:release' ]
+            dev: [
+                'bower-install-simple:dev',
+                'copy:all',
+                'concat:requirejs-config',
+                'css:dev'
+            ],
+            dist: [
+                'bower-install-simple:dist',
+                'requirejs:all',
+                'uglify:dist',
+                'css:dist'
+            ]
+        },
+        css: {
+            dev: [
+                'autoprefixer:dev',
+                'concat:css'
+            ],
+            dist: [
+                'autoprefixer:dist',
+                'cssmin:dist'
+            ]
         },
         concat: {
             'requirejs-config': {
@@ -56,10 +98,25 @@ module.exports = function (grunt) {
                 files: [{
                     src: '<%= config.src.js.main %>',
                     dest: '<%= config.dist %>/<%= pkg.name %>.js'
-                }/*, {
-                    src: '<%= config.spec.main %>',
-                    dest: '<%= config.dist %>/test.js'
-                }*/]
+                }]
+            },
+            css: {
+                options: {
+                     process: function(src, filepath) {
+                        var filename = /\/([^\/]+$)/.exec(filepath)[1];
+
+                        return [
+                            '/* ### ' + filename + ' >> */',
+                            src,
+                            '/* << ' + filename + ' ### */',
+                            '\n'
+                        ].join('\n\n');
+                    }  
+                },
+                files: [{
+                    src: '<%= config.styles.dir %>/**/*.css',
+                    dest: '<%= config.dist %>/<%= pkg.name %>.css'
+                }]
             }
         },
         copy: {
@@ -83,9 +140,56 @@ module.exports = function (grunt) {
             }
         },
         uglify: {
-            release: {
-                src: '<%= config.dist %>/<%= pkg.name %>.js',
-                dest: '<%= config.dist %>/<%= pkg.name %>.js'
+            dist: {
+                files: [{
+                    src: '<%= config.dist %>/<%= pkg.name %>.js',
+                    dest: '<%= config.dist %>/<%= pkg.name %>.js'
+                }]
+            }
+        },
+        autoprefixer: {
+            options: {
+                browsers: [ 'last 2 version' ]
+            },
+            dev: {
+                options: {
+                    cascade: true,
+                    map: 'inline'
+                },
+                expand: true,
+                flatten: true,
+                src: '<%= config.styles.dir %>/**/*.css',
+                dest: '<%= config.dist %>'
+            },
+            dist: {
+                options: {
+                    cascade: false,
+                    map: false
+                },
+                expand: true,
+                flatten: true,
+                src: '<%= config.styles.dir %>/**/*.css',
+                dest: '<%= config.dist %>'
+            }  
+        },
+        cssmin: {
+            dist: {
+                files: [{
+                    src: '<%= config.dist %>/*.css',
+                    dest: '<%= config.dist %>/<%= pkg.name %>.css'
+                }]
+            }
+        },
+        'bower-install-simple': {
+            dev: {
+                options: {
+                    production: false
+                }
+            },
+            dist: {
+                options: {
+                    production: true
+                }
             }
         },
         watch: {
@@ -93,12 +197,19 @@ module.exports = function (grunt) {
                 options: {
                     livereload: true
                 },
-                files: [ '<%= config.src.js.files %>', '<%= config.demo.files %>' ],
+                files: [
+                    '<%= config.src.js.files %>',
+                    '<%= config.styles.files %>',
+                    '<%= config.demo.files %>'
+                ],
                 tasks: [ 'jshint', 'build:dev' ]
             },
             test: {
-                files: [ '<%= config.src.js.files %>', '<%= config.spec.files %>' ],
-                tasks: [ 'build:dist', 'karma:unit:run' ]
+                files: [
+                    '<%= config.src.js.files %>',
+                    '<%= config.spec.files %>'
+                ],
+                tasks: [ 'dist', 'karma:unit:run' ]
             }
         },
         jshint: {
@@ -129,7 +240,20 @@ module.exports = function (grunt) {
                 defaultExt: 'html',
                 runInBackground: false
             }
-        }
+        },
+        karma: {
+            unit: {
+                options: {
+                    configFile: 'test/karma.conf.js',
+                    files: [
+                        '<%= config.dist %>/<%= pkg.name %>.js',
+                        { pattern: 'bower_components/**/*', included: false },
+                        { pattern: 'src/scripts/**/*.spec.js', included: false },
+                        'test/main.js'
+                    ]
+                }
+            }
+        },
     });
 
     require('load-grunt-tasks')(grunt);

@@ -1,0 +1,1 @@
+body{font-family:sans-serif;font-size:32px;margin:1em 0 0;padding:0;text-align:center;-webkit-animation:blink .5s linear .5s infinite alternate;animation:blink .5s linear .5s infinite alternate}@-webkit-keyframes blink{from{color:#000}to{color:red}}@keyframes blink{from{color:#000}to{color:red}}body{font-size:48px}

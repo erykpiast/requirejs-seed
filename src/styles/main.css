@@ -1,0 +1,18 @@
+body {
+	font-family: sans-serif;
+	font-size: 32px;
+	margin: 0;
+	margin-top: 1em;
+	padding: 0;
+	text-align: center;
+	animation: blink .5s linear .5s infinite alternate;
+}
+
+@keyframes blink {
+	from {
+		color: #000;
+	}
+	to {
+		color: #F00;
+	}
+}
