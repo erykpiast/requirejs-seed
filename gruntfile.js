@@ -50,6 +50,7 @@ module.exports = function (grunt) {
                 }
             },
             spec: {
+                dir: 'test',
                 main: 'test/main.js',
                 files: 'src/scripts/**/*.spec.js'
             },
@@ -248,6 +249,7 @@ module.exports = function (grunt) {
                 options: {
                     configFile: 'test/karma.conf.js',
                     files: [
+                        '<%= config.spec.dir %>/phantomjs-extensions.js',
                         '<%= config.dist %>/<%= pkg.name %>.js',
                         { pattern: 'bower_components/**/*', included: false },
                         { pattern: 'src/scripts/**/*.spec.js', included: false },
