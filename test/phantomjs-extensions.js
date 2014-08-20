@@ -7,7 +7,7 @@ if (!Function.prototype.bind) {
         }
 
         var FNOP = function () { };
-        var instanceOfFNOP; try { instanceOfFNOP = this instanceof FNOP; } catch(e) { };
+        var instanceOfFNOP; try { instanceOfFNOP = this instanceof FNOP; } catch(e) { }
         var aArgs = Array.prototype.slice.call(arguments, 1),
             fToBind = this,
             fBound = function () {
